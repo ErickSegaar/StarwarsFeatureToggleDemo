@@ -1,37 +1,22 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using StarwarsWeb.HardProviders;
 using StarwarsWeb.Models;
-using StarwarsWeb.Proxy;
 
 namespace StarwarsWeb.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
-        private readonly ISwapiClient proxy;
-        private readonly HardStarshipProvider provider = new HardStarshipProvider();
 
-        public HomeController(ILogger<HomeController> logger, ISwapiClient proxy)
+        public HomeController(ILogger<HomeController> logger)
         {
             this.logger = logger;
-            this.proxy = proxy;
         }
 
         public IActionResult Index()
         {
             return View();
-        }
-
-        public async Task<IActionResult> People()
-        {
-            return View(await proxy.GetPeople().ConfigureAwait(true));
-        }
-        public IActionResult Starships()
-        {
-            return View(provider.GetStarships());
         }
 
         public IActionResult Privacy()

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.FeatureManagement;
 using Polly;
 using Refit;
 using StarwarsWeb.Proxy;
@@ -25,6 +26,7 @@ namespace StarwarsWeb
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureTypedClients(services);
+            services.AddFeatureManagement();
             services.AddControllersWithViews();
         }
 
