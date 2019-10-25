@@ -1,0 +1,26 @@
+﻿@using StarwarsWeb.Proxy
+@inject ISwapiClient proxy
+@{
+    ViewData["Title"] = "People of starwars";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Starwars personas</h1>
+    <table class="table table-bordered table-responsive table-hover">
+        <tr>
+            <th>Name </th>
+            <th>Height </th>
+            <th>Mass </th>
+        </tr>  
+        @foreach (var people in Model?.Peoples)
+        {
+        <tr>
+            <td>@people.Name</td>
+            <td>@people.Height</td>
+            <td>@people.Mass</td>
+        </tr>
+        }
+        </table>
+
+        <div>@Model.Count</div>
+</div>
