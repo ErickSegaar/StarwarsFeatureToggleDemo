@@ -1,6 +1,4 @@
-﻿@using StarwarsWeb.Proxy
-@inject ISwapiClient proxy
-@{
+﻿@{
     ViewData["Title"] = "People of starwars";
 }
 
@@ -12,7 +10,7 @@
             <th>Height </th>
             <th>Mass </th>
         </tr>  
-        @foreach (var people in Model?.Peoples)
+        @foreach (var people in Model.Peoples)
         {
         <tr>
             <td>@people.Name</td>
@@ -21,6 +19,4 @@
         </tr>
         }
         </table>
-
-        <div>@Model.Count</div>
 </div>

@@ -10,7 +10,7 @@ namespace StarwarsWeb.Proxy
     public interface ISwapiClient
     {
         [Get("/api/people")]
-        Task<StarwarsPeopleViewModel> GetPeople();
+        Task<StarwarsPeople> GetPeople();
 
        
     }

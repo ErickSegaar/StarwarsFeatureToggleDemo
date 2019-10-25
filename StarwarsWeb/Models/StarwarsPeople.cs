@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace StarwarsWeb.Models
 {
-    public class StarwarsPeopleViewModel
+    public class StarwarsPeople
     {
         [JsonProperty(PropertyName = "count")]
         public int Count { get; set; }

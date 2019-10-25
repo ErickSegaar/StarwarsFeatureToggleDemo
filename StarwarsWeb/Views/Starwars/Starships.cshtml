@@ -1,5 +1,4 @@
-﻿@using StarwarsWeb.HardProviders;
-@{
+﻿@{
     ViewData["Title"] = "Starships of starwars";
 }
 
@@ -8,8 +7,8 @@
     <table class="table table-bordered table-responsive table-hover">
         <tr>
             <th>Name </th>
-            <th>Height </th>
-            <th>Mass </th>
+            <th>Model </th>
+            <th>Manufacturer </th>
         </tr>  
         @foreach (var starship in Model)
         {
@@ -20,6 +19,4 @@
         </tr>
         }
         </table>
-
-        <div>@Model.Count</div>
 </div>
