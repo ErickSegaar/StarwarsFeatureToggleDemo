@@ -1,0 +1,25 @@
+﻿@using StarwarsWeb.HardProviders;
+@{
+    ViewData["Title"] = "BETA Planets of starwars";
+}
+
+<div class="text-center">
+    <h1 class="display-4">BETA Planets of starwars</h1>
+    <table class="table table-bordered table-responsive table-hover">
+        <tr>
+            <th>Name </th>
+            <th>Climate </th>
+            <th>Terrain </th>
+        </tr>  
+        @foreach (var planet in Model.Planets)
+        {
+        <tr>
+            <td>@planet.Name</td>
+            <td>@planet.Climate</td>
+            <td>@planet.Terrain</td>
+        </tr>
+        }
+        </table>
+
+        <div>@Model.Count</div>
+</div>
