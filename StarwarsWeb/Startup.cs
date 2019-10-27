@@ -26,7 +26,6 @@ namespace StarwarsWeb
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureTypedClients(services);
-            services.AddFeatureManagement();
             services.AddControllersWithViews();
         }
 
