@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement;
 using StarwarsWeb.HardProviders;
 using StarwarsWeb.Proxy;
 
@@ -8,7 +10,7 @@ namespace StarwarsWeb.Controllers
     public class StarwarsController : Controller
     {
         private readonly ISwapiClient proxy;
-        private readonly HardStarshipProvider provider = new HardStarshipProvider();
+        private readonly HardStarshipProvider starshipProxy = new HardStarshipProvider();
 
         public StarwarsController(ISwapiClient proxy)
         {
@@ -19,9 +21,9 @@ namespace StarwarsWeb.Controllers
             return View(await proxy.GetPeople().ConfigureAwait(true));
         }
 
-        public IActionResult Starships()
+        public async Task<IActionResult> Starships()
         {
-            return View(provider.GetStarships());
+            return View( await starshipProxy.GetStarships().ConfigureAwait(true));
         }
     }
 }

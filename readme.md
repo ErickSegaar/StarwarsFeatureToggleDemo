@@ -75,3 +75,84 @@ public class StarwarsController : Controller
      "ShowPlanetsOfStarwars": false
 }
 ```
+
+# Demo Branche By abstraction
+- Refactor HardStarshipProvider ==> IStarshipClient
+
+``` c#
+using Refit;
+using System.Threading.Tasks;
+
+namespace StarwarsWeb.HardProviders
+{
+    public interface IStarshipClient
+    {
+        Task<Starships> GetStarships();
+    }
+}
+```
+
+- Add dependency to the startup.cs
+
+``` c#
+services.AddTransient<HardStarshipProvider>();
+```
+
+- Demo old site works
+
+- Introduce new toggle
+  - appsettings.json
+
+``` json
+  "FeatureManagement": {
+    "UseImprovedStarshipProvider": false
+  }
+```
+  - startup.cs
+
+``` c#
+services.AddHttpClient("StarshipAPIs", options =>
+{
+    options.BaseAddress = new Uri(Configuration["SwapiApiOptions:BaseUrl"]);
+    options.Timeout = TimeSpan.FromMilliseconds(15000);
+    options.DefaultRequestHeaders.Add("ClientFactory", "Check");
+})
+.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(5000)))
+.AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
+.AddTypedClient(client => RestService.For<IStarshipClient>(client));
+
+services.AddTransient<HardStarshipProvider>();
+services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprovedStarshipProvider =>
+{
+    switch (UseImprovedStarshipProvider)
+    {
+        default:
+            return serviceProvider.GetService<HardStarshipProvider>();
+    }
+});
+```
+ -  FeatureToggle.cs
+
+``` c#
+    public enum FeatureToggles
+    {
+        ShowPlanetsOfStarwars,
+        UseImprovedStarshipProvider
+    }
+```
+
+ -  StarwarsController.cs
+
+``` c#
+// old:  private readonly HardStarshipProvider provider = new HardStarshipProvider();
+//New:
+private readonly IStarshipClient starshipProxy;
+
+// old public StarwarsController(ISwapiClient proxy)
+//new:
+public StarwarsController(ISwapiClient proxy, Func<bool, IStarshipClient> starshipProxy, IFeatureManager featureManager)
+{
+    this.proxy = proxy;
+    this.starshipProxy = starshipProxy(featureManager.IsEnabled(nameof(FeatureToggles.ShowPlanetsOfStarwars)));
+}
+```

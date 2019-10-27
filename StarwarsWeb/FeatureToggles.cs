@@ -7,6 +7,6 @@ namespace StarwarsWeb
 {
     public enum FeatureToggles
     {
-        Planets
+        ShowPlanetsOfStarwars
     }
 }
