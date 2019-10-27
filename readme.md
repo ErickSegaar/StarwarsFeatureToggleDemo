@@ -111,16 +111,6 @@ services.AddTransient<HardStarshipProvider>();
   - startup.cs
 
 ``` c#
-services.AddHttpClient("StarshipAPIs", options =>
-{
-    options.BaseAddress = new Uri(Configuration["SwapiApiOptions:BaseUrl"]);
-    options.Timeout = TimeSpan.FromMilliseconds(15000);
-    options.DefaultRequestHeaders.Add("ClientFactory", "Check");
-})
-.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(5000)))
-.AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
-.AddTypedClient(client => RestService.For<IStarshipClient>(client));
-
 services.AddTransient<HardStarshipProvider>();
 services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprovedStarshipProvider =>
 {
@@ -155,4 +145,40 @@ public StarwarsController(ISwapiClient proxy, Func<bool, IStarshipClient> starsh
     this.proxy = proxy;
     this.starshipProxy = starshipProxy(featureManager.IsEnabled(nameof(FeatureToggles.ShowPlanetsOfStarwars)));
 }
+```
+
+- Show it still works
+- implement new provider
+
+```c# IStarshipClient.cs
+public interface IStarshipClient
+{
+    [Get("/api/starships")]
+    Task<Starships> GetStarships();
+}
+```
+
+```c# Startup.cs
+services.AddHttpClient("StarshipAPIs", options =>
+{
+    options.BaseAddress = new Uri(Configuration["SwapiApiOptions:BaseUrl"]);
+    options.Timeout = TimeSpan.FromMilliseconds(15000);
+    options.DefaultRequestHeaders.Add("ClientFactory", "Check");
+})
+.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(5000)))
+.AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
+.AddTypedClient(client => RestService.For<IStarshipClient>(client));
+
+//...
+
+services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprovedStarshipProvider =>
+{
+    switch (UseImprovedStarshipProvider)
+    {
+        case true
+            return serviceProvider.GetService<IStarshipClient>();
+        default:
+            return serviceProvider.GetService<HardStarshipProvider>();
+    }
+});
 ```
