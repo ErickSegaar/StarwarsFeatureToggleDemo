@@ -182,3 +182,31 @@ services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprove
     }
 });
 ```
+
+# Controlled release
+
+- Change the feature toggle to a percentage toggle appsettings.json
+
+```json
+    "UseImprovedStarshipProvider": {
+      "EnabledFor": [
+        {
+          "Name": "Microsoft.Percentage",
+          "Parameters": {
+            "Value": 50
+          }
+        }
+      ]
+    }
+```
+
+- enable the use of percentage in the setup.cs
+
+``` c#
+        public void ConfigureServices(IServiceCollection services)
+        {
+            ConfigureTypedClients(services);
+            services.AddFeatureManagement().AddFeatureFilter<PercentageFilter>();
+            services.AddControllersWithViews();
+        }
+```
