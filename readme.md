@@ -255,3 +255,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
                 webBuilder.UseStartup<Startup>();
             });
 ```
+
+- push to AzDo
+-Create pipeline and ADD VARIABLE AzureAppConfigurationUrl + secret read only endpoint
