@@ -241,7 +241,8 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
             {
                 webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    if (!Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT").Equals("Development", StringComparison.OrdinalIgnoreCase))
+                    var aspnetcorEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    if (string.IsNullOrEmpty(aspnetcorEnvironment) || !aspnetcorEnvironment.Equals("Development", StringComparison.OrdinalIgnoreCase))
                     {
                         var settings = config.Build();
 
