@@ -210,3 +210,52 @@ services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprove
             services.AddControllersWithViews();
         }
 ```
+
+- Validate the working
+- Next add the cloud integration
+- Configure connection in appconfig
+
+``` json
+  "ConnectionStrings": {
+    "AppConfig": ""
+  },
+```
+
+- configure startup.cs
+
+``` c#
+app.UseRouting();
+
+//Add azure app configuraiton
+app.UseAzureAppConfiguration();
+
+app.UseAuthorization();
+```
+
+- Configure the program.cs
+
+``` c#
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+
+//[....]
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    if (!Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT").Equals("Development", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var settings = config.Build();
+
+                        config.AddAzureAppConfiguration(options =>
+                        {
+                            options.Connect(settings["ConnectionStrings:AppConfig"])
+                            .UseFeatureFlags();
+                        });
+                    }
+                });
+                webBuilder.UseStartup<Startup>();
+            });
+```
