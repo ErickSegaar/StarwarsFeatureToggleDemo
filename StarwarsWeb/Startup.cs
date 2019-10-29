@@ -62,7 +62,7 @@ namespace StarwarsWeb
                 options.Timeout = TimeSpan.FromMilliseconds(15000);
                 options.DefaultRequestHeaders.Add("ClientFactory", "Check");
             })
-            .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(5000)))
+            .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(15000)))
             .AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
             .AddTypedClient(client => RestService.For<ISwapiClient>(client));
         }
