@@ -95,7 +95,20 @@ namespace StarwarsWeb.HardProviders
 - Add dependency to the startup.cs
 
 ``` c#
-services.AddTransient<HardStarshipProvider>();
+services.AddTransient<IStarshipClient,HardStarshipProvider>();
+```
+
+- rework StarshipController.cs
+
+``` c#
+private readonly ISwapiClient proxy;
+private readonly IStarshipClient starshipProxy;
+
+public StarwarsController(ISwapiClient proxy, IStarshipClient starshipProxy)
+{
+    this.proxy = proxy;
+    this.starshipProxy = starshipProxy;
+}
 ```
 
 - Demo old site works
@@ -108,20 +121,8 @@ services.AddTransient<HardStarshipProvider>();
     "UseImprovedStarshipProvider": false
   }
 ```
-  - startup.cs
 
-``` c#
-services.AddTransient<HardStarshipProvider>();
-services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprovedStarshipProvider =>
-{
-    switch (UseImprovedStarshipProvider)
-    {
-        default:
-            return serviceProvider.GetService<HardStarshipProvider>();
-    }
-});
-```
- -  FeatureToggle.cs
+ - FeatureToggle.cs
 
 ``` c#
     public enum FeatureToggles
@@ -131,23 +132,16 @@ services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprove
     }
 ```
 
- -  StarwarsController.cs
+ - StarwarsController.cs
 
 ``` c#
-// old:  private readonly HardStarshipProvider provider = new HardStarshipProvider();
-//New:
-private readonly IStarshipClient starshipProxy;
-
-// old public StarwarsController(ISwapiClient proxy)
-//new:
 public StarwarsController(ISwapiClient proxy, Func<bool, IStarshipClient> starshipProxy, IFeatureManager featureManager)
 {
     this.proxy = proxy;
-    this.starshipProxy = starshipProxy(featureManager.IsEnabled(nameof(FeatureToggles.ShowPlanetsOfStarwars)));
+    this.starshipProxy = starshipProxy(featureManager.IsEnabled(nameof(FeatureToggles.UseImprovedStarshipProvider)));
 }
 ```
 
-- Show it still works
 - implement new provider
 
 ```c# IStarshipClient.cs
@@ -169,19 +163,21 @@ services.AddHttpClient("StarshipAPIs", options =>
 .AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
 .AddTypedClient(client => RestService.For<IStarshipClient>(client));
 
-//...
-
+services.AddTransient<HardStarshipProvider>();
 services.AddTransient<Func<bool, IStarshipClient>>(serviceProvider => UseImprovedStarshipProvider =>
 {
     switch (UseImprovedStarshipProvider)
     {
-        case true
+        case true:
             return serviceProvider.GetService<IStarshipClient>();
+
         default:
             return serviceProvider.GetService<HardStarshipProvider>();
     }
 });
 ```
+
+-show result
 
 # Controlled release
 
